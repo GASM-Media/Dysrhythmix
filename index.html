@@ -1,20 +1,36 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Dysrhythmix</title>
 </head>
-<body>
-    <h1>THERE IS NO STOPPING</h1>
-    <p>Dysrhythmix is an audio sample randomizer. This is version -1. Hitting the play button will result in another randomly triggered sample, and the "Brain Rot" / "Tweaking" controls are wonky at best rn. When adjusted, audio currently cuts out and the updated effect is applied when the new sample plays. You've been warned. </p>
-    <p id="currentAudio">Sample: None</p>
-    <button id="playButton">Play</button>
-    <button id="loopButton">Loop Current</button>
 
-    <label for="panningSlider">Panning Strength:</label>
+<body>
+
+    <h1>Dysrhythmix</h1>
+
+    <p>THERE IS NO STOPPING
+        Dysrhythmix is an audio sample fucktarder, and currently behaves as such.</p>
+
+    <ol>
+        <li>Adjust Tweaker Strength and Brain Damage</li>
+        <li>Hit play, or loop for current pattern to repeat.</li>
+        <li>To stop it, refresh your browser</li>
+        <li>Drag and drop additional samples to add to the sample pool.</li>
+    </ol>
+
+    <br>
+    <label for="panningSlider">Tweaker Strength:</label>
     <input type="range" id="panningSlider" min="-1" max="1" step="0.01" value="0">
     <br>
-    <label for="frequencySlider">Frequency Range:</label>
+    <label for="frequencySlider">Brain Damage:</label>
     <input type="range" id="frequencySlider" min="0" max="20000" step="10" value="2000">
+
+    <p id="currentAudio">Currently Playing: None</p>
+
+    <button id="playButton">Play</button>
+    <button id="loopButton">Toggle Loop</button>
+    <button onclick="location.reload()">Emergency Stop</button>
 
     <div id="dropArea">Drop Audio Files Here</div>
 
@@ -76,7 +92,9 @@
 
         function playRandomAudio() {
             const playButton = document.getElementById('playButton');
+            console.log(playButton.disabled)
             playButton.disabled = true;
+            console.log(playButton.disabled)
 
             if (sourceNode) {
                 sourceNode.stop();
@@ -102,7 +120,7 @@
                         applyFrequencyPanning(); // Apply frequency-based panning to the audio
                         sourceNode.start();
                         currentAudioDisplay.textContent = `Currently Playing: ${randomAudioFile}`;
-                        playButton.disabled = false;
+
                     });
                 })
                 .catch(error => {
@@ -111,11 +129,6 @@
                 });
         }
 
-        function pauseAudio() {
-            if (sourceNode) {
-                sourceNode.stop();
-            }
-        }
 
         function toggleLoop() {
             isLooping = !isLooping;
@@ -151,8 +164,6 @@
         const playButton = document.getElementById('playButton');
         playButton.addEventListener('click', playRandomAudio);
 
-        const pauseButton = document.getElementById('pauseButton');
-        pauseButton.addEventListener('click', pauseAudio);
 
         const loopButton = document.getElementById('loopButton');
         loopButton.addEventListener('click', toggleLoop);
@@ -167,6 +178,19 @@
         frequencySlider.addEventListener('input', () => {
             applyFrequencyPanning();
         });
+
+
+
+        <!-- visualizer -->
+        function updateBackgroundColor(frequencyData) {
+            const body = document.body;
+            const maxFrequencyValue = Math.max(...frequencyData);
+
+            // Map the maximum frequency value to a color range
+            const colorValue = Math.floor((maxFrequencyValue / 255) * 360);
+            const hue = (colorValue + 120) % 360; // Offset for a more visually pleasing range
+            body.style.backgroundColor = `hsl(${hue}, 70%, 70%)`;
+        }
     </script>
 
     <style>
@@ -184,4 +208,5 @@
         }
     </style>
 </body>
+
 </html>
