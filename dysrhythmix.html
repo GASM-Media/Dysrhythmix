@@ -1,17 +1,21 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>Random Audio Player</title>
 </head>
-
 <body>
     <button id="playButton">Play</button>
-<!--     <button id="pauseButton">Pause</button> -->
+    <button id="pauseButton">Pause</button>
     <button id="loopButton">Toggle Loop</button>
     <p id="currentAudio">Currently Playing: None</p>
 
     <div id="dropArea">Drop Audio Files Here</div>
+
+    <label for="panningSlider">Panning Strength:</label>
+    <input type="range" id="panningSlider" min="-1" max="1" step="0.01" value="0">
+    <br>
+    <label for="frequencySlider">Frequency Range:</label>
+    <input type="range" id="frequencySlider" min="0" max="20000" step="10" value="2000">
 
     <script>
         const audioFiles = [
@@ -39,6 +43,35 @@
             return audioFiles[randomIndex];
         }
 
+        function applyFrequencyPanning() {
+            const analyser = audioContext.createAnalyser();
+            analyser.fftSize = 1024;
+
+            sourceNode.connect(analyser);
+            analyser.connect(audioContext.destination);
+
+            const frequencyData = new Uint8Array(analyser.frequencyBinCount);
+
+            analyser.getByteFrequencyData(frequencyData);
+
+            const minFreq = 20;
+            const maxFreq = parseFloat(frequencySlider.value);
+            const freqRange = maxFreq - minFreq;
+
+            for (let i = 0; i < frequencyData.length; i++) {
+                const normalizedFreq = i / frequencyData.length;
+                const frequency = minFreq + normalizedFreq * freqRange;
+
+                const panningValue = parseFloat(panningSlider.value);
+
+                const panNode = audioContext.createStereoPanner();
+                panNode.pan.value = panningValue;
+
+                sourceNode.connect(panNode);
+                panNode.connect(audioContext.destination);
+            }
+        }
+
         function playRandomAudio() {
             const playButton = document.getElementById('playButton');
             playButton.disabled = true;
@@ -64,6 +97,7 @@
                             playRandomAudio();
                         };
 
+                        applyFrequencyPanning(); // Apply frequency-based panning to the audio
                         sourceNode.start();
                         currentAudioDisplay.textContent = `Currently Playing: ${randomAudioFile}`;
                         playButton.disabled = false;
@@ -120,6 +154,17 @@
 
         const loopButton = document.getElementById('loopButton');
         loopButton.addEventListener('click', toggleLoop);
+
+        const panningSlider = document.getElementById('panningSlider');
+        const frequencySlider = document.getElementById('frequencySlider');
+
+        panningSlider.addEventListener('input', () => {
+            applyFrequencyPanning();
+        });
+
+        frequencySlider.addEventListener('input', () => {
+            applyFrequencyPanning();
+        });
     </script>
 
     <style>
@@ -137,5 +182,4 @@
         }
     </style>
 </body>
-
 </html>
