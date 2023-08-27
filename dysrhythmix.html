@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Random Audio Player</title>
+</head>
+
+<body>
+    <button id="playButton">Play</button>
+    <button id="pauseButton">Pause</button>
+    <button id="loopButton">Toggle Loop</button>
+    <p id="currentAudio">Currently Playing: None</p>
+
+    <div id="dropArea">Drop Audio Files Here</div>
+
+    <script>
+        const audioFiles = [
+            "./audio/randomizer_sample_1.wav",
+            "./audio/randomizer_sample_2.wav",
+            "./audio/randomizer_sample_3.wav",
+            "./audio/randomizer_sample_4.wav",
+            "./audio/drums_1-001.wav",
+            "./audio/drums_1-002.wav",
+            "./audio/drums_1-003.wav",
+            "./audio/drums_1-004.wav",
+            "./audio/drums_2-001.wav",
+            "./audio/drums_2-002.wav",
+            "./audio/drums_2-003.wav",
+            "./audio/drums_2-004.wav"
+        ];
+
+        let currentAudioIndex = -1;
+        let isLooping = false;
+        let audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let sourceNode;
+
+        function getRandomAudio() {
+            const randomIndex = Math.floor(Math.random() * audioFiles.length);
+            return audioFiles[randomIndex];
+        }
+
+        function playRandomAudio() {
+            const playButton = document.getElementById('playButton');
+            playButton.disabled = true;
+
+            if (sourceNode) {
+                sourceNode.stop();
+            }
+
+            const currentAudioDisplay = document.getElementById('currentAudio');
+            const randomAudioFile = getRandomAudio();
+            currentAudioIndex = audioFiles.indexOf(randomAudioFile);
+
+            fetch(randomAudioFile)
+                .then(response => response.arrayBuffer())
+                .then(buffer => {
+                    audioContext.decodeAudioData(buffer, decodedData => {
+                        sourceNode = audioContext.createBufferSource();
+                        sourceNode.buffer = decodedData;
+                        sourceNode.connect(audioContext.destination);
+                        sourceNode.loop = isLooping;
+
+                        sourceNode.onended = () => {
+                            playRandomAudio();
+                        };
+
+                        sourceNode.start();
+                        currentAudioDisplay.textContent = `Currently Playing: ${randomAudioFile}`;
+                        playButton.disabled = false;
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching or decoding audio:', error);
+                    playButton.disabled = false;
+                });
+        }
+
+        function pauseAudio() {
+            if (sourceNode) {
+                sourceNode.stop();
+            }
+        }
+
+        function toggleLoop() {
+            isLooping = !isLooping;
+
+            if (sourceNode) {
+                sourceNode.loop = isLooping;
+            }
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            const files = event.dataTransfer.files;
+            for (const file of files) {
+                if (file.type.startsWith('audio/')) {
+                    audioFiles.push(URL.createObjectURL(file));
+                }
+            }
+        }
+
+        const dropArea = document.getElementById('dropArea');
+        dropArea.addEventListener('dragover', event => {
+            event.preventDefault();
+            dropArea.classList.add('highlight');
+        });
+
+        dropArea.addEventListener('dragleave', event => {
+            event.preventDefault();
+            dropArea.classList.remove('highlight');
+        });
+
+        dropArea.addEventListener('drop', handleDrop);
+
+        const playButton = document.getElementById('playButton');
+        playButton.addEventListener('click', playRandomAudio);
+
+        const pauseButton = document.getElementById('pauseButton');
+        pauseButton.addEventListener('click', pauseAudio);
+
+        const loopButton = document.getElementById('loopButton');
+        loopButton.addEventListener('click', toggleLoop);
+    </script>
+
+    <style>
+        #dropArea {
+            width: 200px;
+            height: 100px;
+            border: 2px dashed #ccc;
+            text-align: center;
+            line-height: 100px;
+            margin-top: 10px;
+        }
+
+        #dropArea.highlight {
+            background-color: #f0f0f0;
+        }
+    </style>
+</body>
+
+</html>
