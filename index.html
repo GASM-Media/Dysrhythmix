@@ -7,15 +7,16 @@
 
 <body>
 
-    <h1>Dysrhythmix</h1>
+    <h1>Dysrhythmix - MP3</h1>
+    <h2>AINT NEVA GONNA STOP</h2>
 
-    <p>THERE IS NO STOPPING
+    <p>
         Dysrhythmix is an audio sample fucktarder, and currently behaves as such.</p>
 
     <ol>
         <li>Adjust Tweaker Strength and Brain Damage</li>
         <li>Hit play, or loop for current pattern to repeat.</li>
-        <li>To stop it, refresh your browser</li>
+        <li>To stop it, refresh your browser or hit the emergency button.</li>
         <li>Drag and drop additional samples to add to the sample pool.</li>
     </ol>
 
@@ -37,18 +38,18 @@
 
     <script>
         const audioFiles = [
-            "./audio/randomizer_sample_1.wav",
-            "./audio/randomizer_sample_2.wav",
-            "./audio/randomizer_sample_3.wav",
-            "./audio/randomizer_sample_4.wav",
-            "./audio/drums_1-001.wav",
-            "./audio/drums_1-002.wav",
-            "./audio/drums_1-003.wav",
-            "./audio/drums_1-004.wav",
-            "./audio/drums_2-001.wav",
-            "./audio/drums_2-002.wav",
-            "./audio/drums_2-003.wav",
-            "./audio/drums_2-004.wav"
+            "./audio-mp3/randomizer_sample_1.mp3",
+            "./audio-mp3/randomizer_sample_2.mp3",
+            "./audio-mp3/randomizer_sample_3.mp3",
+            "./audio-mp3/randomizer_sample_4.mp3",
+            "./audio-mp3/drums_1-001.mp3",
+            "./audio-mp3/drums_1-002.mp3",
+            "./audio-mp3/drums_1-003.mp3",
+            "./audio-mp3/drums_1-004.mp3",
+            "./audio-mp3/drums_2-001.mp3",
+            "./audio-mp3/drums_2-002.mp3",
+            "./audio-mp3/drums_2-003.mp3",
+            "./audio-mp3/drums_2-004.mp3"
         ];
 
         let currentAudioIndex = -1;
@@ -92,9 +93,7 @@
 
         function playRandomAudio() {
             const playButton = document.getElementById('playButton');
-            console.log(playButton.disabled)
             playButton.disabled = true;
-            console.log(playButton.disabled)
 
             if (sourceNode) {
                 sourceNode.stop();
@@ -194,13 +193,83 @@
     </script>
 
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        h1,
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        p {
+            max-width: 80%;
+            text-align: center;
+            color: #666;
+        }
+
+        ol {
+            max-width: 80%;
+            text-align: left;
+            color: #666;
+            padding-left: 1em;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            color: #333;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        /* Adjust the width for desktop screens */
+        @media (min-width: 768px) {
+
+            #panningSlider,
+            #frequencySlider {
+                width: 50%;
+            }
+        }
+
+        #currentAudio {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
         #dropArea {
-            width: 200px;
+            width: 80%;
             height: 100px;
             border: 2px dashed #ccc;
             text-align: center;
             line-height: 100px;
-            margin-top: 10px;
+            margin-top: 20px;
+            background-color: #fff;
         }
 
         #dropArea.highlight {
